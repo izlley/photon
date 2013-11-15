@@ -1,0 +1,12 @@
+setup.py
+fb303/FacebookBase.py
+fb303/FacebookService.py
+fb303/__init__.py
+fb303/constants.py
+fb303/ttypes.py
+fb303_scripts/__init__.py
+fb303_scripts/fb303_simple_mgmt.py
+thrift.egg-info/PKG-INFO
+thrift.egg-info/SOURCES.txt
+thrift.egg-info/dependency_links.txt
+thrift.egg-info/top_level.txt
