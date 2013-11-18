@@ -24,6 +24,7 @@
 #include "workqueue.h"
 #include "exec-get.h"
 #include "exec-post.h"
+#include "hbase-op.h"
 
 /* Port to listen on. */
 #define SERVER_PORT 8080
@@ -34,6 +35,10 @@
 #define NUM_THREADS 8
 
 #define NUM_FREE_JOB 100
+
+#define HBASE_ADDR "127.0.0.1"
+#define HBASE_PORT 9090
+#define HBASE_CREDIT_TBL "credit"
 
 /* Behaves similarly to fprintf(stderr, ...), but adds file, line, and function
  information. */
@@ -332,6 +337,11 @@ int runServer(void) {
     event_add(ev_accept, NULL);
 
     printf("Server running.\n");
+    
+    // conf for hbase
+    HBaseOp::setHostAddr((char*)HBASE_ADDR);
+    HBaseOp::setHostPort(HBASE_PORT);
+    HBaseOp::setCreditTbl(HBASE_CREDIT_TBL);
 
     /* Start the event loop. */
     event_base_dispatch(evbase_accept);

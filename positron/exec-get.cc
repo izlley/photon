@@ -4,14 +4,16 @@
 #include <string>
 #include <string.h>
 #include "exec-get.h"
+#include "hbase-op.h"
 
 int ExecGet::execGet(const char *aUri, struct evbuffer *aEvb) {
   char sCh;
-  char *sSrc = NULL;
-  char *sVal = NULL;
+  //char *sSrc = NULL;
+  //char *sVal = NULL;
   int i = 1;
   int sSplit[MAX_URI_SPLIT] = {0};
   std::map<std::string, std::string> sKv;
+  std::string sGetRes, sSrc, sVal;
   
   printf("execGet : %s\n", aUri); 
   // TODO:error check
@@ -35,16 +37,17 @@ int ExecGet::execGet(const char *aUri, struct evbuffer *aEvb) {
     }
     //
     
-    sSrc = (char *)sKv.at(std::string("src")).c_str();
-    sVal = (char *)sKv.at(std::string("val")).c_str();
+    sSrc = sKv.at(std::string("src"));
+    sVal = sKv.at(std::string("val"));
     
     //debuging
-    printf("src = %s, val = %s\n", sSrc, sVal);
+    printf("src = %s, val = %s\n", sSrc.c_str(), sVal.c_str());
     //
     
     /*
      * HBase get request (ver. hbase-0.94.6-cdh4.3.0)
      */
+    sGetRes = HBaseOp::getRow(&(HBaseOp::gCreditTbl), &sVal, "f:lvl");
     
     // copy result to event buffer
     evbuffer_add_printf(aEvb, "<html><head>test-test</head></html>\n");

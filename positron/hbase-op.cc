@@ -1,24 +1,35 @@
 #include <stdio.h>
+#include <unistd.h>
+#include <stdint.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <poll.h>
 #include <string.h>
 #include "hbase-op.h"
 
 #include <iostream>
 
 #include <boost/lexical_cast.hpp>
-#include <protocol/TBinaryProcotol.h>
-#include <transport/TSocket.h>
-#include <transport/TTransportUtils.h>
+#include <thrift/transport/TSocket.h>
+#include <thrift/transport/TTransportUtils.h>
+#include <thrift/protocol/TBinaryProtocol.h>
 
 using namespace apache::thrift;
 using namespace apache::thrift::protocol;
 using namespace apache::thrift::transport;
+//using namespace apache::thrift::transport::TSocket;
 using namespace apache::hadoop::hbase::thrift;
 
-static void HBaseOp::getRow(std::string *aTbl, std::string *aRk,
+std::string HBaseOp::gCreditTbl;
+char HBaseOp::ghostaddr[MAX_ADDR_STR];
+int  HBaseOp::ghostport; 
+
+std::string HBaseOp::getRow(std::string *aTbl, std::string *aRk,
                             const char *aCol) {
   bool isFramed = false;
   
-  boost::shared_ptr<TTransport> socket(new TSocket(hostaddr, hostport));
+  boost::shared_ptr<TTransport> socket(new TSocket(ghostaddr, ghostport));
   boost::shared_ptr<TTransport> transport;
   
   if (isFramed) {
@@ -43,7 +54,7 @@ static void HBaseOp::getRow(std::string *aTbl, std::string *aRk,
      * }
      */
      
-    client.get(value, *aTbl, *aRk, "entry:foo", dummyAttributes);
+    client.get(value, *aTbl, *aRk, aCol, dummyAttributes);
     if (!value.size()) {
       std::cerr << "FATAL: get no value!" << std::endl;
     } else {
@@ -51,29 +62,29 @@ static void HBaseOp::getRow(std::string *aTbl, std::string *aRk,
     }
     
     transport->close();
+    
+    return value.begin()->value;
   } catch (const TException &tx) {
     std::cerr << "ERROR: " << tx.what() << std::endl;
+    return NULL;
   }
-  
-  
-  
 }
 
-static void HBaseOp::setHostAddr(char *aAddr) {
-  snprintf(hostaddr, MAX_ADDR_STR, aAddr);
+void HBaseOp::setHostAddr(char *aAddr) {
+  snprintf(ghostaddr, MAX_ADDR_STR, aAddr);
 }
 
-static void HBaseOp::setHostPort(int aPort) {
-  hostport = aPort;
+void HBaseOp::setHostPort(int aPort) {
+  ghostport = aPort;
 }
 
-static void HBaseOp::setCreditTbl(char *aName) {
+void HBaseOp::setCreditTbl(char *aName) {
   gCreditTbl = std::string(aName);
 }
 
-static void HBaseOp::printCell(const std::vector<TCell> &cellResult) {
+void HBaseOp::printCell(const std::vector<TCell> &cellResult) {
   for (size_t i = 0; i < cellResult.size(); i++) {
-    for (std::vector<TCell>::iterator it = cellResult.begin();
+    for (std::vector<TCell>::const_iterator it = cellResult.begin();
          it != cellResult.end(); ++it) {
         std::cout << "CELL" << " => " << it->value << "; ";
       }

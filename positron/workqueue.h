@@ -27,7 +27,7 @@ typedef struct freejob {
 
 typedef struct workqueue {
     struct worker *workers;
-    struct job *waitingJobs;
+   ; struct job *waitingJobs;
 	struct freejob sfreeJob;
 	int freeCount;
 	int maxFreeCnt;
@@ -37,14 +37,17 @@ typedef struct workqueue {
     pthread_cond_t jobsCond;
 } workqueue_t;
 
-int workqueue_init(workqueue_t *aWorkqueue, int aNumWorkers);
+class WorkQueue {
+ public:
+  static int workqueue_init(workqueue_t *aWorkqueue, int aNumWorkers, int aNumFreeJobs);
 
-void workqueue_shutdown(workqueue_t *aWorkqueue);
+  static void workqueue_shutdown(workqueue_t *aWorkqueue);
 
-void workqueue_add_job(workqueue_t *aWorkqueue, job_t *aJob);
+  static void workqueue_add_job(workqueue_t *aWorkqueue, job_t *aJob);
 
-void wqFreeJob(workqueue_t *aWorkqueue, job_t *aJob);
+  static void wqFreeJob(workqueue_t *aWorkqueue, job_t *aJob);
 
-void wqAllocJob(workqueue_t *aWorkqueue, job_t *aJob);
+  static void wqAllocJob(workqueue_t *aWorkqueue, job_t **aJob);
+};
 
 #endif  /* #ifndef WORKQUEUE_H */

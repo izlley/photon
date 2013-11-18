@@ -6,20 +6,17 @@
 #define MAX_ADDR_STR 20
 
 class HBaseOp {
+ private:
+  static void printCell(const std::vector<apache::hadoop::hbase::thrift::TCell> &cellResult);
  public:
-  static void getRow(std::string *aTbl, std::string *aRk,
+  static std::string gCreditTbl;
+  static char ghostaddr[MAX_ADDR_STR];
+  static int  ghostport; 
+  
+  static std::string getRow(std::string *aTbl, std::string *aRk,
                      const char *aCol);
   static void setHostAddr(char *aAddr);
   static void setHostPort(int aPort);
   static void setCreditTbl(char *aName);
-  static char* getHostAddr(){ return hostaddr; };
-  static int   getHostPort(){ return hostport; };
-  static std::string *getCreditTbl(){ return &gCreditTbl; };
-  
- private:
-  static char hostaddr[MAX_ADDR_STR];
-  static int  hostport;
-  static std::string gCreditTbl; 
-  static void printCell(const std::vector<TCell> &cellResult);
 };
 #endif
