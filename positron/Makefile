@@ -1,4 +1,5 @@
 CFLAGS=-Wall -g 
+DEBUG=-g
 LDFLAGS=-levent -lpthread -lthrift
 BINS=photon
 GCC=g++
@@ -22,10 +23,10 @@ photon: $(GEN_OBJ) $(OBJECTS)
 	${CC} ${CFLAGS} ${OBJECTS} ${GEN_OBJ} ${LIB_DIR} ${LDFLAGS} -o $@
 
 $(OBJECTS): %.o : %.cc
-	${GCC} ${INC} -c $< -o $@
+	${GCC} ${DEBUG} ${INC} -c $< -o $@
 
 $(GEN_OBJ): %.o : %.cpp
-	${GCC} -DHAVE_NETINET_IN_H -DHAVE_INTTYPES_H ${INC} -c $< -o $@
+	${GCC} ${DEBUG} -DHAVE_NETINET_IN_H -DHAVE_INTTYPES_H ${INC} -c $< -o $@
 
 clean:
 	/bin/rm -rf ${BINS} *.o core *.core

@@ -7,4 +7,8 @@
 #define FAILURE -1
 #define WARN -2
 
+// exec-get.cc
+#define MAX_CREDIT_RES_SIZE 128
+
+
 #endif

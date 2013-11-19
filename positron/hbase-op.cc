@@ -7,6 +7,7 @@
 #include <poll.h>
 #include <string.h>
 #include "hbase-op.h"
+#include "common-macro.h"
 
 #include <iostream>
 
@@ -25,7 +26,7 @@ std::string HBaseOp::gCreditTbl;
 char HBaseOp::ghostaddr[MAX_ADDR_STR];
 int  HBaseOp::ghostport; 
 
-std::string HBaseOp::getRow(std::string *aTbl, std::string *aRk,
+int HBaseOp::getRow(std::string &aRes, std::string *aTbl, std::string *aRk,
                             const char *aCol) {
   bool isFramed = false;
   
@@ -57,16 +58,17 @@ std::string HBaseOp::getRow(std::string *aTbl, std::string *aRk,
     client.get(value, *aTbl, *aRk, aCol, dummyAttributes);
     if (!value.size()) {
       std::cerr << "FATAL: get no value!" << std::endl;
+      return FAILURE;
     } else {
       printCell(value);
     }
     
     transport->close();
-    
-    return value.begin()->value;
+    aRes = value.begin()->value;
+    return SUCCESS;
   } catch (const TException &tx) {
     std::cerr << "ERROR: " << tx.what() << std::endl;
-    return NULL;
+    return FAILURE;
   }
 }
 

@@ -13,8 +13,8 @@ class HBaseOp {
   static char ghostaddr[MAX_ADDR_STR];
   static int  ghostport; 
   
-  static std::string getRow(std::string *aTbl, std::string *aRk,
-                     const char *aCol);
+  static int getRow(std::string &aRes, std::string *aTbl, std::string *aRk,
+                    const char *aCol);
   static void setHostAddr(char *aAddr);
   static void setHostPort(int aPort);
   static void setCreditTbl(char *aName);

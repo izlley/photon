@@ -5,6 +5,7 @@
 #include <string.h>
 #include "exec-get.h"
 #include "hbase-op.h"
+#include "common-macro.h"
 
 int ExecGet::execGet(const char *aUri, struct evbuffer *aEvb) {
   char sCh;
@@ -12,6 +13,9 @@ int ExecGet::execGet(const char *aUri, struct evbuffer *aEvb) {
   //char *sVal = NULL;
   int i = 1;
   int sSplit[MAX_URI_SPLIT] = {0};
+  int sResLen = 0;
+  int sRes;
+  char sResult[MAX_CREDIT_RES_SIZE] = {0};
   std::map<std::string, std::string> sKv;
   std::string sGetRes, sSrc, sVal;
   
@@ -47,10 +51,24 @@ int ExecGet::execGet(const char *aUri, struct evbuffer *aEvb) {
     /*
      * HBase get request (ver. hbase-0.94.6-cdh4.3.0)
      */
-    sGetRes = HBaseOp::getRow(&(HBaseOp::gCreditTbl), &sVal, "f:lvl");
+    sRes = HBaseOp::getRow(sGetRes, &(HBaseOp::gCreditTbl), &sVal, "f:lvl");
+    
+    if (sRes == SUCCESS) {
+      sResLen = sSrc.length() + sGetRes.length() + 4 + 16;
+      if (sResLen < MAX_CREDIT_RES_SIZE) {
+        snprintf(sResult, MAX_CREDIT_RES_SIZE, "{\"src\"=\"%s\",\"data\"=\"%s\"}",
+                 sVal.c_str(), sGetRes.c_str());
+      } else {
+        // size error
+        snprintf(sResult, MAX_CREDIT_RES_SIZE, "{\"error\"=\"result size is too big\"}");
+      }
+    } else {
+      // error
+      snprintf(sResult, MAX_CREDIT_RES_SIZE, "{\"error\"=\"core error\"}");
+    }
     
     // copy result to event buffer
-    evbuffer_add_printf(aEvb, "<html><head>test-test</head></html>\n");
+    evbuffer_add_printf(aEvb, sResult);
     
     
     return SUCCESS;
